@@ -1,5 +1,6 @@
 pub struct DayOne;
 pub struct DayTwo;
+pub struct DayThree;
 
 struct Command {
     r#type: CommandType,
@@ -94,6 +95,38 @@ impl DayTwo {
     }
 }
 
+impl DayThree {
+    pub fn part_one(input: Vec<&str>) -> u64 {
+        let mut gamma: u64 = 0;
+        let mut epsilon: u64 = 0;
+        let max_len: u64 = input.iter().map(|x| x.trim().len()).max().unwrap() as u64;
+        println!("{}", max_len);
+        let nums = input
+            .iter()
+            .map(|s| u64::from_str_radix(s.trim(), 2).unwrap())
+            .collect::<Vec<u64>>();
+
+        for i in 0..max_len {
+            let mut set_count = 0;
+            for n in &nums {
+                if n & (1 << i) != 0 {
+                    set_count += 1;
+                }
+            }
+
+            if set_count * 2 > input.len() {
+                gamma |= 1 << i;
+            } else {
+                epsilon |= 1 << i;
+            }
+        }
+
+        println!("{:b}", gamma);
+        println!("{:b}", epsilon);
+
+        gamma * epsilon
+    }
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -134,5 +167,14 @@ mod tests {
             "forward 2",
         ];
         assert_eq!(DayTwo::part_two(input), 900);
+    }
+
+    #[test]
+    fn test_day_three_part_one() {
+        let input = vec![
+            "00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000",
+            "11001", "00010", "01010",
+        ];
+        assert_eq!(DayThree::part_one(input), 198);
     }
 }
