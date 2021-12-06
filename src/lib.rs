@@ -60,6 +60,26 @@ impl DayTwo {
         depth * horizontal
     }
 
+    pub fn part_two(input: Vec<&str>) -> i32 {
+        let mut horizontal = 0;
+        let mut depth = 0;
+        let mut aim = 0;
+
+        for line in input {
+            let command = DayTwo::to_command(line);
+            match command.r#type {
+                CommandType::Forward => {
+                    horizontal += command.value;
+                    depth += command.value * aim;
+                }
+                CommandType::Up => aim -= command.value,
+                CommandType::Down => aim += command.value,
+            }
+        }
+
+        depth * horizontal
+    }
+
     fn to_command(input: &str) -> Command {
         let mut iter = input.split_whitespace();
         Command {
@@ -73,6 +93,7 @@ impl DayTwo {
         }
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -100,5 +121,18 @@ mod tests {
             "forward 2",
         ];
         assert_eq!(DayTwo::part_one(input), 150);
+    }
+
+    #[test]
+    fn test_day_two_part_two() {
+        let input = vec![
+            "forward 5",
+            "down 5",
+            "forward 8",
+            "up 3",
+            "down 8",
+            "forward 2",
+        ];
+        assert_eq!(DayTwo::part_two(input), 900);
     }
 }
