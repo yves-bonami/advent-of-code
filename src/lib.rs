@@ -100,7 +100,6 @@ impl DayThree {
         let mut gamma: u64 = 0;
         let mut epsilon: u64 = 0;
         let max_len: u64 = input.iter().map(|x| x.trim().len()).max().unwrap() as u64;
-        println!("{}", max_len);
         let nums = input
             .iter()
             .map(|s| u64::from_str_radix(s.trim(), 2).unwrap())
@@ -121,10 +120,65 @@ impl DayThree {
             }
         }
 
-        println!("{:b}", gamma);
-        println!("{:b}", epsilon);
-
         gamma * epsilon
+    }
+
+    pub fn part_two(input: Vec<&str>) -> u64 {
+        let oxygen: u64;
+        let co_two: u64;
+        let max_len: u64 = input.iter().map(|x| x.trim().len()).max().unwrap() as u64;
+        let nums = input
+            .iter()
+            .map(|s| u64::from_str_radix(s.trim(), 2).unwrap())
+            .collect::<Vec<u64>>();
+
+        //for i in 0..max_len {
+        oxygen = *DayThree::filter(nums.clone(), 0, max_len, true)
+            .first()
+            .unwrap();
+        co_two = *DayThree::filter(nums.clone(), 0, max_len, false)
+            .first()
+            .unwrap();
+
+        oxygen * co_two
+    }
+
+    fn filter(input: Vec<u64>, mask: u64, max: u64, most_common: bool) -> Vec<u64> {
+        let mut result: Vec<u64> = input.clone();
+        if mask != max - 1 {
+            result = DayThree::filter(result, mask + 1, max, most_common);
+        }
+
+        if result.len() == 1 {
+            return result;
+        }
+
+        let set: Vec<u64> = result
+            .iter()
+            .filter(|n| *n & (1 << mask) != 0)
+            .map(|n| *n)
+            .collect();
+
+        let unset = result
+            .iter()
+            .filter(|n| *n & (1 << mask) == 0)
+            .map(|n| *n)
+            .collect();
+
+        if set.len() * 2 >= result.len() as usize {
+            if most_common {
+                result = set;
+            } else {
+                result = unset;
+            }
+        } else {
+            if most_common {
+                result = unset;
+            } else {
+                result = set;
+            }
+        }
+        result
     }
 }
 #[cfg(test)]
@@ -176,5 +230,14 @@ mod tests {
             "11001", "00010", "01010",
         ];
         assert_eq!(DayThree::part_one(input), 198);
+    }
+
+    #[test]
+    fn test_day_three_part_two() {
+        let input = vec![
+            "00100", "11110", "10110", "10111", "10101", "01111", "00111", "11100", "10000",
+            "11001", "00010", "01010",
+        ];
+        assert_eq!(DayThree::part_two(input), 230);
     }
 }
